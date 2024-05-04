@@ -31,7 +31,7 @@ export const dbServiceUpdateOne = async (model,filter,data,options={new:true}) =
 }
 
 // update Multiple documents and return count
-export const dbServiceUpdateMany = async () => {
+export const dbServiceUpdateMany = async (model,filter,options) => {
   try {
     const result = await model.updateMany(filter,options)
     if(result){
@@ -47,7 +47,7 @@ export const dbServiceUpdateMany = async () => {
 // Delete Single Document that will return updated document
 export const  dbServiceDeleteOne = async (model,filter,option={new:true}) => {
   try {
-    const result = await model.findOneAndDelete(filter,options)
+    const result = await model.findOneAndDelete(filter,option)
     if(result){
       return result
     }else{
@@ -59,7 +59,7 @@ export const  dbServiceDeleteOne = async (model,filter,option={new:true}) => {
 }
 
 // Delete multiple Documents and return count
-const dbServiceDeleteMany = async(model,filter) => {
+export const dbServiceDeleteMany = async(model,filter,options={new:true}) => {
   try {
     const result = await model.deleteMany(filter,options)
     if(result){
@@ -99,3 +99,23 @@ export const dbServiceFindMany = async (model,filter,options={}) => {
     console.log("Error in DB Service FindOne",error.message ? error.message : error)
   }
 }
+
+  // count documents
+  export const dbServiceCount = async (model, filter) => {
+    const result = await model.countDocuments(filter);
+    if(result){
+      return result
+    }else{
+      return
+    }
+  };
+
+  // find documents with pagination
+  export const dbServicePaginate = async(model, filter, options) => {
+    const result = await model.paginate(filter, options) 
+    if(result){
+      return result
+    }else{
+      return 
+    }
+  }

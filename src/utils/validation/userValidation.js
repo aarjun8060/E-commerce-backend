@@ -5,6 +5,7 @@
 
 import joi from "joi";
 
+
 export const schemaKeys = joi.object({
     password: joi.string().allow(null).allow(''),
     email: joi.string().email({ tlds: { allow: false } }),
@@ -13,3 +14,12 @@ export const schemaKeys = joi.object({
     isActive: joi.boolean(),
     isDeleted: joi.boolean(),
 }).unknown(true);
+
+/** validation keys and properties of user for updation */
+export const updateAuthSchemaKeys = joi.object({
+    email: joi.string().email({ tlds: { allow: false } }),
+    phone: joi.number().integer().allow(0),
+    userType: joi.number().allow(0),
+    isActive: joi.boolean(),
+    isDeleted: joi.boolean(),
+  }).unknown(true);
