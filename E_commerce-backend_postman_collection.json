@@ -1,0 +1,2830 @@
+{
+  "info": {
+    "_postman_id": "63f4125a-2dfb-4738-9120-ba2ff21487a8",
+    "name": "E_commerce-backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27961443",
+    "description": "API collection for the E-commerce backend service.\n\n- Two top-level folders: **User App** (customer-facing) and **Admin** (back-office).\n- Each folder carries its own bearer token (`{{userToken}}` / `{{adminToken}}`), auto-populated by the `login` requests' test scripts.\n- IDs (user, product, cart, order, etc.) are collection variables auto-captured from `create`/`list`/`login` responses where possible, so requests can be run top-to-bottom (or via Collection Runner) without manual edits.\n- Set `baseUrl` to point at any environment (local/staging/prod)."
+  },
+  "item": [
+    {
+      "name": "User App",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"abc@gmail.com\",\r\n    \"password\":\"123456\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Register a new customer account."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"abc@gmail.com\",\r\n    \"password\":\"password\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Log in a customer and capture the bearer token + userId for subsequent requests."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const token = body.token || (body.data && body.data.token) || body.accessToken;",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (token) pm.collectionVariables.set('userToken', token);",
+                      "    if (id) pm.collectionVariables.set('userId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "me",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/get/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "get",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "Fetch a customer's profile by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\" : \"Arjun Singh\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/update/{{userId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "update",
+                    "{{userId}}"
+                  ]
+                },
+                "description": "Update a customer's profile fields."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "reset-password-otp",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"arjunsingh0528159@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/reset-password-otp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "reset-password-otp"
+                  ]
+                },
+                "description": "Request a one-time password to reset a forgotten password."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "reset-password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"code\":\"123456\",\r\n    \"newPassword\" :\"sdfghjkl\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/auth/reset-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "auth",
+                    "reset-password"
+                  ]
+                },
+                "description": "Reset the password using the OTP code received by email."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {\"name\":1},\r\n    \"populate\": \"\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 9,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/product/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "product",
+                    "list"
+                  ]
+                },
+                "description": "Paginated/filterable product catalogue listing."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    const list = body.data || body.docs || body.results || [];",
+                      "    if (Array.isArray(list) && list.length) pm.collectionVariables.set('productId', list[0]._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/product/get/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "product",
+                    "get",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "Fetch a single product by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "count",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"where\": {\r\n    \"isActive\": true\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/product/count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "product",
+                    "count"
+                  ]
+                },
+                "description": "Count products matching a filter, without returning documents."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Cart",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{\"isDeleted\": false},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {},\r\n    \"populate\": \"\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 10,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/cart/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "cart",
+                    "list"
+                  ]
+                },
+                "description": "List the current user's cart(s)."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/cart/get/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "cart",
+                    "get",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Fetch a single cart by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/cart/soft-delete/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "cart",
+                    "soft-delete",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Soft-delete (mark isDeleted=true) a cart without permanently removing it."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"userId\":\"{{userId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"{{productId}}\",\r\n            \"qty\": 1\r\n        }\r\n     ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/cart/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "cart",
+                    "create"
+                  ]
+                },
+                "description": "Add product(s) to a new cart for a user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (id) pm.collectionVariables.set('cartId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"products\": [\r\n                    {\r\n                        \"productId\": \"{{productId}}\",\r\n                        \"qty\": 3 \r\n                    }\r\n            ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/cart/update/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "cart",
+                    "update",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Update quantities/products in an existing cart."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{ \"isDeleted\": false},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {\"name\":1},\r\n    \"populate\": \"products\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 10,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/order/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "order",
+                    "list"
+                  ]
+                },
+                "description": "List the current user's orders."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/order/get/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "order",
+                    "get",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Fetch a single order by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/order/soft-delete/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "order",
+                    "soft-delete",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Soft-delete an order."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": " {\r\n    \"userId\":\"{{userId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"{{productId}}\",\r\n            \"qty\": 3\r\n        } \r\n     ],\r\n         \"address\":{\r\n              \"locality\" : \"basti khera\",\r\n              \"city\" : \"unnao\",\r\n              \"state\" : \"uttar pradesh\",\r\n              \"country\" : \"India\",\r\n              \"zipcode\" : 209827\r\n            },\r\n            \"status\": \"pending\",\r\n            \"paymentStatus\": \"pending\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/order/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "order",
+                    "create"
+                  ]
+                },
+                "description": "Place a new order from cart contents + shipping address."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (id) pm.collectionVariables.set('orderId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n        \"products\": [\r\n            {\r\n                        \"address\": {\r\n                            \"locality\": \"basti khera\",\r\n                            \"city\": \"unnao\",\r\n                            \"state\": \"uttar pradesh\",\r\n                            \"country\": \"India\",\r\n                            \"zipcode\": 209827\r\n                        },\r\n                        \"orderStatus\": {\r\n                            \"orderConfirm\": {\r\n                                \"isConfirmed\": true,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            },\r\n                            \"shipped\": {\r\n                                \"isConfirmed\": false,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            },\r\n                            \"outForDelivery\": {\r\n                                \"isConfirmed\": false,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            },\r\n                            \"delivered\": {\r\n                                \"isConfirmed\": false,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            },\r\n                            \"cancel\": {\r\n                                \"isConfirmed\": false,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            },\r\n                            \"refunded\": {\r\n                                \"isConfirmed\": false,\r\n                                \"date\": \"2023-09-13T02:18:22.836Z\"\r\n                            }\r\n                        },\r\n                        \"productId\": \"{{productId}}\",\r\n                        \"qty\": 7,\r\n                        \"packageId\": \"{{productId}}\",\r\n                        \"status\": \"upcoming\",\r\n                        \"paymentStatus\": \"pending\"\r\n                    }\r\n        ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/userapp/order/update/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "userapp",
+                    "order",
+                    "update",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Update an order's status, shipping details, or line items."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{userToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"adminArjun@gmail.com\",\r\n    \"password\":\"password\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "register"
+                  ]
+                },
+                "description": "Register a new admin account."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\":\"adminArjun@gmail.com\",\r\n    \"password\":\"password\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Log in as admin and capture the bearer token + adminId."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const token = body.token || (body.data && body.data.token) || body.accessToken;",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (token) pm.collectionVariables.set('adminToken', token);",
+                      "    if (id) pm.collectionVariables.set('adminId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {},\r\n    \"populate\": \"\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 33,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "list"
+                  ]
+                },
+                "description": "Admin: paginated product listing."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200) {",
+                      "    const body = pm.response.json();",
+                      "    const list = body.data || body.docs || body.results || [];",
+                      "    if (Array.isArray(list) && list.length) pm.collectionVariables.set('productId', list[0]._id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "  {\"title\" :{\r\n        \"shortTitle\" : \"FLITE ONE\",\r\n        \"longTitle\" : \"Clogs for men  FL-2020\"\r\n      },\r\n      \"category\":\"footwear\",\r\n      \"subCategory\":\"Sandals & Clogs\",\r\n      \"price\":{\r\n        \"mrp\":  549,\r\n        \"discount\": \"0\",\r\n        \"cost\": 0\r\n      },\r\n      \"image\" : \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-1.jpg\",\r\n      \"productImages\" : [\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-2.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-3.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-5.jpg\"\r\n        }\r\n      ]\r\n     \r\n      \r\n     \r\n  }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "create"
+                  ]
+                },
+                "description": "Admin: create a new product."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (id) pm.collectionVariables.set('productId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "add-bulk",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"data\" :[\r\n          {\"title\" :{\r\n        \"shortTitle\" : \"FLITE ONE\",\r\n        \"longTitle\" : \"Clogs for men  FL-2020\"\r\n      },\r\n      \"category\":\"footwear\",\r\n      \"subCategory\":\"Sandals & Clogs\",\r\n      \"price\":{\r\n        \"mrp\":  549,\r\n        \"discount\": \"0\",\r\n        \"cost\": 0\r\n      },\r\n      \"image\" : \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-1.jpg\",\r\n      \"productImages\" : [\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-2.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-3.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-5.jpg\"\r\n        }\r\n      ]\r\n     \r\n      \r\n     \r\n  },\r\n    {\"title\" :{\r\n        \"shortTitle\" : \"FLITE TWO\",\r\n        \"longTitle\" : \"Clogs for men  FL-2020\"\r\n      },\r\n      \"category\":\"footwear\",\r\n      \"subCategory\":\"Sandals & Clogs\",\r\n      \"price\":{\r\n        \"mrp\":  549,\r\n        \"discount\": \"0\",\r\n        \"cost\": 0\r\n      },\r\n      \"image\" : \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-1.jpg\",\r\n      \"productImages\" : [\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-2.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-3.jpg\"\r\n        },\r\n        {\r\n            \"name\":\"CLOGS\",\r\n            \"path\": \"https://dxkvlfvncvqr8.cloudfront.net/media/product-image/FL-2020-NVWH-5.jpg\"\r\n        }\r\n      ]\r\n     \r\n      \r\n     \r\n  }\r\n    ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/add-bulk",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "add-bulk"
+                  ]
+                },
+                "description": "Admin: create multiple products in one call."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/get/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "get",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "Admin: fetch a single product by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "count",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"where\": {\r\n    \"isDeleted\": false\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "count"
+                  ]
+                },
+                "description": "Admin: count products matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/soft-delete/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "soft-delete",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "Admin: soft-delete a single product."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete-many",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \r\n  \"ids\": [\r\n    \"648ed533f21112fa41a8da3d\",\"{{productId}}\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/soft-delete-many",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "soft-delete-many"
+                  ]
+                },
+                "description": "Admin: soft-delete multiple products by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/delete/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "delete",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "Admin: permanently delete a single product."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete-many",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"ids\": [\r\n    \"{{productId}}\",\"6624c4bfa7c976541594af0d\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/delete-many",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "delete-many"
+                  ]
+                },
+                "description": "Admin: permanently delete multiple products by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \"title\": {\r\n                    \"shortTitle\": \"Website for Education\",\r\n                    \"longTitle\": \"this most power full website create in Next.js\"\r\n             }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/update/{{productId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "update",
+                    "{{productId}}"
+                  ]
+                },
+                "description": "Admin: update a single product."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update-many",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"filter\": {\r\n    \"isActive\": true\r\n  },\r\n  \"data\": {\r\n    \"isDeleted\": false\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/product/update-many",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "product",
+                    "update-many"
+                  ]
+                },
+                "description": "Admin: bulk-update products matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Cart",
+          "item": [
+            {
+              "name": "create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"userId\":\"{{userId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"{{productId}}\",\r\n            \"qty\": 1\r\n        }\r\n     ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "create"
+                  ]
+                },
+                "description": "Admin: create a cart on behalf of a user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (id) pm.collectionVariables.set('cartId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "bulk-cart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"data\": [\r\n {\r\n    \"userId\":\"{{userId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"63d990cd710097cb0f230b54\",\r\n            \"qty\": 1\r\n        },\r\n         {\r\n            \"productId\": \"63d990cd710097cb0f230b5c\",\r\n            \"qty\": 2\r\n        }\r\n     ]\r\n},\r\n{\r\n    \"userId\":\"{{userId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"63d990cd710097cb0f230b54\",\r\n            \"qty\": 1\r\n        },\r\n         {\r\n            \"productId\": \"63d990cd710097cb0f230b5c\",\r\n            \"qty\": 2\r\n        }\r\n     ]\r\n}\r\n  ]\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/bulk-cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "bulk-cart"
+                  ]
+                },
+                "description": "Admin: create multiple carts in one call."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {\"name\":1},\r\n    \"populate\": \"\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 10,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "list"
+                  ]
+                },
+                "description": "Admin: paginated cart listing."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/get/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "get",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Admin: fetch a single cart by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"isDeleted\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/update/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "update",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Admin: update a single cart."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update-bulk",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"filter\": {\r\n    \"isActive\": true\r\n  },\r\n  \"data\": {\r\n    \"isDeleted\": false\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/update-bulk",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "update-bulk"
+                  ]
+                },
+                "description": "Admin: bulk-update carts matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "count",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"where\": {\r\n        \"isActive\":true\r\n    } \r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "count"
+                  ]
+                },
+                "description": "Admin: count carts matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/soft-delete/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "soft-delete",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Admin: soft-delete a single cart."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/delete/{{cartId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "delete",
+                    "{{cartId}}"
+                  ]
+                },
+                "description": "Admin: permanently delete a single cart."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete-many",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \r\n  \"ids\": [\r\n    \"63d99d91e7da88be4f888201\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/soft-delete-many",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "soft-delete-many"
+                  ]
+                },
+                "description": "Admin: soft-delete multiple carts by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "bulk-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"isWarning\": true,\r\n  \"ids\": [\r\n    \"63d99d8fe7da88be4f8881f7\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/bulk-delete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "bulk-delete"
+                  ]
+                },
+                "description": "Admin: permanently delete multiple carts by ID (destructive)."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"userId\":\"{{userId}}\",\r\n    \"cartId\":\"{{cartId}}\",\r\n    \"products\":[\r\n        {\r\n            \"productId\": \"648ed533f21112fa41a8da3d\",\r\n            \"qty\": \"1\",\r\n            \"packageId\":\"{{packageId}}\",\r\n            \"address\":{\r\n              \"locality\" : \"basti khera\",\r\n              \"city\" : \"unnao\",\r\n              \"state\" : \"uttar pradesh\",\r\n              \"country\" : \"India\",\r\n              \"zipcode\" : 209827\r\n           },\r\n           \"paymentId\": \"{{paymentId}}\",\r\n      \"status\": \"upcoming\",\r\n      \"paymentStatus\": \"pending\",\r\n      \"orderStatus\":{\r\n         \"orderConfirm\":{\r\n          \"isConfirmed\":true,\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         },\r\n         \"shipped\":{\r\n          \"isConfirmed\":true,\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         },\r\n         \"outForDelivery\":{\r\n          \"isConfirmed\":\"true\",\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         },\r\n         \"delivered\":{\r\n          \"isConfirmed\":true,\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         },\r\n         \"cancel\":{\r\n          \"isConfirmed\":false,\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         },\r\n         \"refunded\":{\r\n          \"isConfirmed\":false,\r\n          \"date\":\"2023-09-13T02:18:22.836Z\"\r\n         } \r\n      }\r\n        }\r\n     ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/create",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "create"
+                  ]
+                },
+                "description": "Admin: create an order on behalf of a user."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});",
+                      "if (pm.response.code === 200 || pm.response.code === 201) {",
+                      "    const body = pm.response.json();",
+                      "    const id = (body.data && body.data._id) || body._id || body.id;",
+                      "    if (id) pm.collectionVariables.set('orderId', id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "add-bulk",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"data\": [\r\n {\r\n    \"userId\":\"63d8e6dc64b22b343fc9b0d2\",\r\n    \"cartId\":\"63d99e84e7da88be4f888220\",\r\n    \"paymentId\":\"{{paymentId}}\",\r\n    \"packageId\":\"{{packageId}}\",\r\n    \"status\":\"active\",\r\n    \"paymentStatus\":\"success\"\r\n},\r\n{\r\n    \"userId\":\"63d8e6dc64b22b343fc9b0d2\",\r\n    \"cartId\":\"63d99e84e7da88be4f888220\",\r\n    \"paymentId\":\"{{paymentId}}\",\r\n    \"packageId\":\"{{packageId}}\",\r\n    \"status\":\"active\",\r\n    \"paymentStatus\":\"success\"\r\n}\r\n  ]\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/add-bulk",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "add-bulk"
+                  ]
+                },
+                "description": "Admin: create multiple orders in one call."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "list",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"query\":{},\r\n  \"options\": {\r\n    \"collation\": \"\",\r\n    \"sort\": {\"name\":1},\r\n    \"populate\": \"\",\r\n    \"projection\": \"\",\r\n    \"lean\": false,\r\n    \"leanWithId\": true,\r\n    \"page\": 1,\r\n    \"limit\": 10,\r\n    \"pagination\": true,\r\n    \"useEstimatedCount\": false,\r\n    \"useCustomCountFn\": false,\r\n    \"forceCountFn\": false,\r\n    \"read\": {},\r\n    \"options\": {}\r\n  },\r\n  \"isCountOnly\": false\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/list",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "list"
+                  ]
+                },
+                "description": "Admin: paginated order listing."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/get/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "get",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Admin: fetch a single order by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "count",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"where\": {\r\n    \"isActive\": true\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/count",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "count"
+                  ]
+                },
+                "description": "Admin: count orders matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n   \"status\":\"pending\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/update/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "update",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Admin: update a single order (status, etc.)."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "update-bulk",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"filter\": {\r\n    \"isActive\": true\r\n  },\r\n  \"data\": {\r\n    \"isDeleted\": false\r\n  }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/update-bulk",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "update-bulk"
+                  ]
+                },
+                "description": "Admin: bulk-update orders matching a filter."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/soft-delete/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "soft-delete",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Admin: soft-delete a single order."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "bulk-soft-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \r\n  \"ids\": [\r\n    \"63d9a589d66464df53594dcf\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/cart/bulk-soft-delete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "cart",
+                    "bulk-soft-delete"
+                  ]
+                },
+                "description": "Admin: soft-delete multiple orders by ID."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "delete",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/delete/{{orderId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "delete",
+                    "{{orderId}}"
+                  ]
+                },
+                "description": "Admin: permanently delete a single order."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "bulk-delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"ids\": [\"\",\"\"]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/order/bulk-delete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "order",
+                    "bulk-delete"
+                  ]
+                },
+                "description": "Admin: permanently delete multiple orders by ID (destructive)."
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "exec": [
+                      "pm.test('Status code is successful', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                      "});",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cartId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "packageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
