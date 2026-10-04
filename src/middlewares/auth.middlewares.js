@@ -1,90 +1,31 @@
-/**
- * auth.js
- * @description :: middleware that checks authentication and authorization of user
- */
+import jwt from "jsonwebtoken";
+import { User } from "../models/user.model.js";
 
-import passport from 'passport';
-import { LOGIN_ACCESS, PLATFORM } from '../constants.js';
-import { dbServiceFindOne } from '../db/dbServices.js';
-import { User } from '../models/user.model.js';
-import { UserTokens } from '../models/userToken.model.js';
-
-/**
- * @description : returns callback that verifies required rights and access
- * @param {Object} req : request of route.
- * @param {callback} resolve : resolve callback for succeeding method.
- * @param {callback} reject : reject callback for error.
- * @param {int} platform : platform
- */
-const verifyCallback = (req, resolve, reject, platform) => async (error, user, info) => {
-  console.log("hiii 1", user,platform)
-  if (error || info || !user) {
-    return reject('Unauthorized User');
-  }
-  console.log("hiii 2")
-
-  req.user = user;
-  if (!user.isActive || user.isDeleted) {
-    return reject('User is deactivated');
-  }
-  console.log("user",req.user)
-  let userToken = await dbServiceFindOne(UserTokens, {
-    token: (req.headers.authorization).replace('Bearer ', ''),
-    userId: user.id
-  });
-  console.log("userToken",userToken)
-  if (!userToken) {
-    return reject('Token not found');
-  }
-  if (userToken.isTokenExpired) {
-    return reject('Token is Expired');
-  }
-  if (user.userType) {
-    let allowedPlatforms = LOGIN_ACCESS[user.userType] ? LOGIN_ACCESS[user.userType] : [];
-    console.log(allowedPlatforms);
-    if (!allowedPlatforms.includes(platform)) {
-      return reject('Unauthorized user');
+export const requireAdmin = async (req, res, next) => {
+  try {
+    const header = req.headers.authorization || "";
+    if (!header.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "Admin authentication required" });
     }
-  }
-  resolve();
-};
 
-/**
- * @description : authentication middleware for request.
- * @param {Object} req : request of route.
- * @param {Object} res : response of route.
- * @param {callback} next : executes the next middleware succeeding the current middleware.
- * @param {int} platform : platform
- */
-export const auth = (platform) => async (req, res, next) => {
-  
-  if (platform == PLATFORM.USERAPP) {
-    return new Promise((resolve, reject) => {
-      passport.authenticate('userapp-rule', { session: false }, verifyCallback(req, resolve, reject, platform))(
-        req,
-        res,
-        next
-      );
-    })
-      .then(() => next())
-      .catch((error) => {
-        return res.unAuthorized({ message: error.message });
-      });
-  }
-  else if (platform == PLATFORM.ADMIN) {
-    console.log("plat",platform,req.headers)
-    return new Promise((resolve, reject) => {
-      passport.authenticate('admin-rule', { session: false }, verifyCallback(req, resolve, reject, platform))(
-        req,
-        res,
-        next
-      );
-    })
-      .then(() => next())
-      .catch((error) => {
-        return res.unAuthorized({ message: error.message });
-      });
-  }
- 
-};
+    const token = header.slice(7);
+    const payload = jwt.verify(token, process.env.ADMIN_JWT_SECRET, { algorithms: ["HS256"] });
+    if (payload.role !== "Admin" || typeof payload.id !== "string" || payload.sub !== payload.id) {
+      return res.status(401).json({ success: false, message: "Invalid admin token" });
+    }
+    const admin = await User.findOne({
+      _id: payload.id,
+      userType: "Admin",
+      isActive: true,
+    }).select("name email userType isActive");
 
+    if (!admin) {
+      return res.status(401).json({ success: false, message: "Unauthorized admin" });
+    }
+
+    req.admin = admin;
+    next();
+  } catch {
+    return res.status(401).json({ success: false, message: "Invalid or expired admin token" });
+  }
+};

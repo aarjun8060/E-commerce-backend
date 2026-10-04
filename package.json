@@ -1,14 +1,19 @@
 {
-  "name": "e_commerce-backend",
+  "name": "school-news-admissions-api",
   "version": "1.0.0",
-  "description": "E-Commerce website",
+  "description": "Express API for school News & Events and Admission Enquiries",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "start": "node -r dotenv/config src/index.js"
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "start": "node -r dotenv/config src/index.js",
+    "seed:admin": "node scripts/seedAdmin.js",
+    "seed:school-data": "node scripts/seedSchoolData.js"
   },
-  "author": "arjun Singh",
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Arjun Singh",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.0.2",
@@ -16,20 +21,12 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
-    "ejs": "^3.1.10",
     "express": "^4.18.2",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
-    "mongoose-paginate-v2": "^1.7.4",
-    "mongoose-unique-validator": "^4.0.0",
-    "otp-generator": "^4.0.1",
-    "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1",
-    "sib-api-v3-sdk": "^8.5.0"
+    "multer": "^2.0.2"
   }
 }

@@ -1,126 +1,30 @@
-import  mongoose , { Schema } from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2"
-import { USER_TYPES } from "../constants.js";
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import uniqueValidator from "mongoose-unique-validator";
-import { convertObjectToEnum } from "../utils/common.js";
 
-const myCustomLabels = {
-    totalDocs: 'itemCount',
-    docs: 'data',
-    limit: 'perPage',
-    page: 'currentPage',
-    nextPage: 'next',
-    prevPage: 'prev',
-    totalPages: 'pageCount',
-    pagingCounter: 'slNo',
-    meta: 'paginator',
-};
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true, trim: true, maxlength: 100 },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+    password: { type: String, required: true, minlength: 12 },
+    userType: { type: String, enum: ["Admin"], default: "Admin" },
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true },
+);
 
-mongoosePaginate.paginate.options = {customLabels:myCustomLabels}
-const userSchema = new Schema({
-    name:{
-        type:String
-    },
-    password:{
-        type:String
-    },
-    email: {
-        type: String,
-    },
-    phone: {
-        type: Number,
-    },
-    country_code:{
-        type: Number,
-        default:91
-    },
-    address:[{
-        locality : {type:String},
-        city : {type:String},
-        state : {type:String},
-        country : {type:String},
-        zipcode : {type:Number}
-    }],
-
-    userType: {
-        type: Number,
-        enum: convertObjectToEnum(USER_TYPES),
-        required: true
-    },
-    languagePreference: {
-        type: String,
-        default: "en"
-    },
-    avatar: {
-        type: String
-    },
-    resetPasswordLink: {
-        code: String,
-        expireTime: Date
-    },
-    loginRetryLimit: {
-        type: Number,
-        default: 0
-    },
-    loginReactiveTime: { 
-        type: Date 
-    },
-    ssoAuth: { 
-        googleId: { type: String }
-    },
-    createdBy: {
-        ref: 'user',
-        type: Schema.Types.ObjectId
-    },
-    updatedBy: {
-        ref: 'user',
-        type: Schema.Types.ObjectId
-    },
-    isAppUser: { type: Boolean, default: true },
-    isActive: { type: Boolean },
-    isDeleted: { type: Boolean },
-},{
-    timestamps:true
-})
-
-userSchema.pre("save",async function(next){
-    this.isDeleted = false;
-    this.isActive = true;
-
-    if(this.isModified("password")){
-        this.password = await bcrypt.hash(this.password,10);
-    }
-    next();
-})
-
-userSchema.method('toJSON', function () {
-    const {
-      _id, __v, ...object
-    } = this.toObject({ virtuals: true });
-    object.id = _id;
-    delete object.password;
-    return object;
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
 
-userSchema.methods.isPasswordMatch = async function(password){
-    return await bcrypt.compare(password,this.password);
-}
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
-userSchema.methods.generateAccessToken = async function(ACCESS_TOKEN_SECRET){
-    return jwt.sign({
-        _id:this._id,
-        email:this.email,
-        name:this.name,
-    },
-    ACCESS_TOKEN_SECRET,
-    {
-        expiresIn:process.env.ACCESS_TOKEN_EXPIRY
-    }
-    )
-}
+userSchema.methods.toJSON = function () {
+  const { _id, __v, password, ...document } = this.toObject();
+  return { ...document, id: _id };
+};
 
-userSchema.plugin(mongoosePaginate);
-userSchema.plugin(uniqueValidator, { message: 'Error, expected {VALUE} to be unique.' });
-export const User = mongoose.model("User",userSchema);
+export const User = mongoose.model("User", userSchema);

@@ -1,53 +1,84 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
-import passport from "passport";
-import {responseHandler} from "./utils/response/responseHandler.js"
 
-//  All Routes 
-// ------------- USER Routes--------------------
-import userRouter from "./routes/USERAPP/user.routes.js"
-import productRouter from "./routes/USERAPP/products.routes.js"
-import cartRouter from "./routes/USERAPP/cart.routes.js"
-import orderRouter from "./routes/USERAPP/order.routes.js"
-// ==================ADMIN Routes =========================
-import userAdminRouter from "./routes/ADMIN/auth.routes.js"
-import productAdminRouter from "./routes/ADMIN/products.routes.js"
-import cartAdminRouter from "./routes/ADMIN/cart.routes.js"
-import orderAdminRouter from "./routes/ADMIN/order.routes.js"
-
-
-// Strategy Passport 
-import {userappPassportStrategy} from "../config/userappPassportStrategy.js"
-import { adminPassportStrategy } from "../config/adminPassportStrategy.js"
+import adminAuthRouter from "./routes/ADMIN/auth.routes.js";
+import newsEventsAdminRouter from "./routes/ADMIN/newsEvents.routes.js";
+import enquiriesAdminRouter from "./routes/ADMIN/enquiries.routes.js";
+import newsEventRouter from "./routes/PUBLIC/newsEvent.routes.js";
+import enquiryRouter from "./routes/PUBLIC/enquiry.routes.js";
 
 const app = express();
+app.set("trust proxy", 1);
 
-app.use(cors({
-    origin : process.env.CORS_ORIGIN,
-    credential : true
-}))
-app.use(responseHandler);
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(passport.initialize());
-app.use(express.json({limit:"16kb"}))
-app.use(express.urlencoded({extended:true,limit:"16kb"}))
-app.use(express.static("public"))
-app.use(cookieParser())
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : true,
+    credentials: true,
+  }),
+);
+
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(express.static("public"));
 
 
-userappPassportStrategy(passport);
-adminPassportStrategy(passport);
+app.use(
+    // midle ware to log requests
+    (req, res, next) => {
+        console.log(`${req.method} ${req.url}`);
+        next();
+    }
+)
 
-//  User Routes
-app.use("/api/v1/userapp/auth",userRouter)
-app.use("/api/v1/userapp/product",productRouter)
-app.use("/api/v1/userapp/cart",cartRouter)
-app.use("/api/v1/userapp/order",orderRouter)
-// ADMIN ROUTES
-app.use("/api/v1/admin/auth",userAdminRouter)
-app.use("/api/v1/admin/product",productAdminRouter)
-app.use("/api/v1/admin/cart",cartAdminRouter)
-app.use("/api/v1/admin/order",orderAdminRouter)
+app.get("/health", (_req, res) => {
+  res.json({ success: true, message: "API is running" });
+});
 
-export { app }
+
+app.use("/api/v1/admin/auth", adminAuthRouter);
+app.use("/api/v1/admin/news-events", newsEventsAdminRouter);
+app.use("/api/v1/admin/enquiries", enquiriesAdminRouter);
+app.use("/api/v1/news-events", newsEventRouter);
+app.use("/api/v1/enquiries", enquiryRouter);
+
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
+
+app.use((error, req, res, next) => {
+  if (res.headersSent) return next(error);
+
+  if (error?.code === "LIMIT_FILE_SIZE") {
+    return res.status(422).json({
+      success: false,
+      message: "Validation failed",
+      errors: { image: "Image must not exceed 2 MB" },
+    });
+  }
+
+  if (error?.name === "MulterError") {
+    return res.status(422).json({
+      success: false,
+      message: "Invalid multipart request",
+      errors: { image: error.message },
+    });
+  }
+
+  if (error?.type === "entity.parse.failed") {
+    return res.status(400).json({ success: false, message: "Malformed JSON" });
+  }
+
+  if (error?.name === "CastError" && error?.kind === "ObjectId") {
+    return res.status(400).json({ success: false, message: "Invalid ObjectId" });
+  }
+
+  console.error(error);
+  return res.status(500).json({ success: false, message: "Internal server error" });
+});
+
+export { app };
